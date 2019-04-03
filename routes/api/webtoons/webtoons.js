@@ -12,10 +12,10 @@ const db = require('../../../module/pool');
 const upload = require('../../../config/multer');
 
 //웹툰 등록
-router.post('/', upload.single("wtThum"), async(req, res) => {
-    utils.isLoggedin();
+router.post('/', upload.single("wtThum"), async(req, res, next) => {
+    await utils.isLoggedin(req, res, next);
     const title = req.body.title;
-    const wtThum = req.file;
+    const wtThum = req.file.location;
     const registDate = moment().format('YYYY-MM-DD hh:mm:ss');
 
     const registWebToonQuery = 'INSERT INTO webtoon(title, author, thumnail, registDate, likes, isFinished) VALUES (?, ?, ?, ?, ?, ?)';

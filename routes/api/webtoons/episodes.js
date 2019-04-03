@@ -12,7 +12,7 @@ const upload = require('../../../config/multer');
 
 //웹툰의 전체 에피소드 보여줌
 router.get('/list/:wtIdx', async(req, res) => {
-    const wtIdx = req.params.wtIdx;
+    const wtIdx = parseInt(req.params.wtIdx);
 
     const getWebToonQuery = 'SELECT title, likes FROM webtoon WHERE idx = ?';
     const getEpisodeListQuery = 'SELECT * FROM episode WHERE wtIdx = ? ORDER BY chapter DESC';
@@ -35,15 +35,20 @@ router.get('/list/:wtIdx', async(req, res) => {
 
 //특정 회차 에피소드 보여줌
 router.get('/:epIdx', async(req, res) => {
+    const epIdx = parseInt(req.params.epIdx);
+
     const selectEpisodeQuery = 'SELECT chapter, title FROM episode WHERE idx = ?';
     const selectEpImgQuery = 'SELECT epImg FROM episodeImgs WHERE epIdx = ? ORDER BY depth';
+    const updateEpHitsQuery = 'UPDATE episode SET hits = hits + 1 WHERE idx = ?';
 
-    const selectEpisodeResult = await db.queryParam_Arr(selectEpisodeQuery, [req.params.epIdx]);
-    const selectEpImgResult = await db.queryParam_Arr(selectEpImgQuery, [req.params.epIdx]);
+    const selectEpisodeResult = await db.queryParam_Arr(selectEpisodeQuery, [epIdx]);
+    const selectEpImgResult = await db.queryParam_Arr(selectEpImgQuery, [epIdx]);
 
     if (!selectEpisodeResult || !selectEpImgResult) {
         res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.EP_DB_SELECT_ERROR));
     } else {
+        const updateEpHitsResult = await db.queryParam_Arr(updateEpHitsQuery, [epIdx]);
+
         const result = {
             epInfo: selectEpisodeResult,
             imgs: selectEpImgResult
