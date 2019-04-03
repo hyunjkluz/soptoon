@@ -1,10 +1,14 @@
 var express = require('express');
 var router = express.Router();
 
+const aws = require('aws-sdk');
+aws.config.loadFromPath('./config/aws_config.json');
+
 const utils = require('../../../module/utils/utils');
 const resMessage = require('../../../module/utils/responseMessage');
 const statusCode = require('../../../module/utils/statusCode');
 const db = require('../../../module/pool');
+const upload = require('../../../config/multer');
 
 //웹툰의 전체 에피소드 보여줌
 router.get('/list/:wtIdx', async(req, res) => {
