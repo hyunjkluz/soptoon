@@ -16,7 +16,7 @@ router.post('/', async(req, res) => {
     let pw = req.body.password;
 
     const chkUserQuery = 'SELECT * FROM membership WHERE id = ?';
-    const registUserQuery = 'INSERT INTO membership(userId, name, password, salt, refreshToken) VALUES (?, ?, ?, ?, ?)';
+    const registUserQuery = 'INSERT INTO membership(userId, grade, name, password, salt, refreshToken) VALUES (?, ?, ?, ?, ?, ?)';
 
     if (!id || !pw || !name) {
         res.status(200).send(utils.successFalse(statusCode.BAD_REQUEST, resMessage.ID_OR_PW_NULL_VALUE));
@@ -32,7 +32,7 @@ router.post('/', async(req, res) => {
             const hashedPw = await crypto.pbkdf2(pw, salt.toString('base64'), 100000, 32, 'sha512');
             const refreshToken = randtoken.uid(256);
 
-            const registUserResult = await db.queryParam_Arr(registUserQuery, [id, name, hashedPw, salt, refreshToken]);
+            const registUserResult = await db.queryParam_Arr(registUserQuery, [id, 0, name, hashedPw, salt, refreshToken]);
 
             if (!registUserResult) {
                 res.status(200).send(utils.successFalse(statusCode.DB_ERROR, resMessage.MEMBERSHIP_DB_INSERT_ERROR))
